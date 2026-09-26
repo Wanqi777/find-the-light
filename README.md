@@ -91,7 +91,7 @@ The generated interface was smaller than expected and left unused space around t
 
 AI automatically introduced additional text instructions and a **Sound On** control.
 
-Some of these additions were useful, but they also changed the simplicity of the original design.
+Some of these additions were useful, but they also changed the purpose of the original design.
 
 **3. The new interactions needed stronger hints**
 
