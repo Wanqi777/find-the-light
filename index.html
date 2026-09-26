@@ -1,0 +1,1838 @@
+<!doctype html>
+<!-- [ADDED] CODE GUIDE: This room was added as a new file. Search for [ADDED] to
+     find the related CSS, HTML, and JavaScript. These comments do not alter the page. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Find the Light — an interactive room study with three distinct light interactions.">
+  <title>Find the Light</title>
+  <style>
+    :root {
+      --ink: #161c25;
+      --night: #0b1019;
+      --wall: #18222e;
+      --wall-deep: #111923;
+      --floor: #101923;
+      --cream: #eee6d5;
+      --muted: #aeb5b7;
+      --warm: #ffcb78;
+      --warm-deep: #e8864f;
+      --cool: #d8ecf0;
+      --cool-deep: #91b8c4;
+      --sunset: #f1a26a;
+      --moon: #9bb5e7;
+      --line: rgba(232, 234, 225, 0.16);
+      --panel: rgba(16, 24, 33, 0.78);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: #080c12;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--cream);
+      background:
+        radial-gradient(ellipse at 50% -20%, #263442 0%, transparent 48rem),
+        linear-gradient(150deg, #0d141d 0%, #070b11 100%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    button:not(:disabled) {
+      cursor: pointer;
+    }
+
+    button:focus-visible {
+      outline: 3px solid rgba(255, 214, 135, 0.95);
+      outline-offset: 6px;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .page {
+      width: min(1240px, calc(100% - 38px));
+      margin: 0 auto;
+      padding: 24px 0 35px;
+    }
+
+    .masthead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      min-height: 50px;
+      margin-bottom: 19px;
+    }
+
+    .wordmark {
+      display: flex;
+      align-items: baseline;
+      gap: 13px;
+      color: var(--cream);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.84rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .wordmark::before {
+      width: 10px;
+      height: 10px;
+      content: "";
+      background: var(--warm);
+      border-radius: 50%;
+      box-shadow: 0 0 15px rgba(255, 203, 120, 0.7);
+    }
+
+    .wordmark small {
+      color: #73808b;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 0.67rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: none;
+    }
+
+    .reset-room {
+      display: inline-grid;
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      color: #aab1b0;
+      background: rgba(239, 230, 213, 0.045);
+      border: 1px solid rgba(239, 230, 213, 0.14);
+      border-radius: 50%;
+      font-size: 1.15rem;
+      place-items: center;
+      transition: color 180ms ease, border-color 180ms ease, background 180ms ease, transform 180ms ease;
+    }
+
+    .reset-room:hover {
+      color: var(--cream);
+      background: rgba(255, 203, 120, 0.1);
+      border-color: rgba(255, 203, 120, 0.48);
+      transform: rotate(-23deg);
+    }
+
+    .room-shell {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(235, 237, 229, 0.17);
+      border-radius: 20px;
+      box-shadow: 0 28px 85px rgba(0, 0, 0, 0.46);
+    }
+
+    /* [ADDED 01] Dim room, ambient light, furniture, and lighting-sensitive surfaces. */
+    .room {
+      --explore-x: 50%;
+      --explore-y: 46%;
+      --ceiling-charge: 0deg;
+      --ceiling-preview-opacity: 0;
+      position: relative;
+      min-height: 600px;
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        linear-gradient(180deg, var(--wall) 0 64%, var(--floor) 64% 100%);
+      aspect-ratio: 16 / 9.2;
+      transition: background 760ms ease;
+      user-select: none;
+    }
+
+    .room::before {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      pointer-events: none;
+      content: "";
+      opacity: 0.36;
+      background:
+        linear-gradient(90deg, transparent 49.85%, rgba(248, 245, 232, 0.08) 50%, transparent 50.15%),
+        repeating-linear-gradient(90deg, transparent 0 9.5%, rgba(246, 244, 231, 0.026) 9.6% 9.74%, transparent 9.85% 10%),
+        radial-gradient(ellipse at 50% 100%, rgba(0, 0, 0, 0.42), transparent 58%);
+      mix-blend-mode: screen;
+    }
+
+    .room::after {
+      position: absolute;
+      z-index: 29;
+      inset: 0;
+      pointer-events: none;
+      content: "";
+      background: radial-gradient(ellipse at center, transparent 34%, rgba(2, 6, 10, 0.47) 100%);
+      transition: opacity 600ms ease;
+    }
+
+    .room.is-lit::after {
+      opacity: 0.58;
+    }
+
+    .ceiling-line {
+      position: absolute;
+      z-index: 3;
+      top: 0;
+      left: 50%;
+      width: 1px;
+      height: 11%;
+      background: linear-gradient(#677580, #222d39);
+      transform: translateX(-50%);
+    }
+
+    .window {
+      position: absolute;
+      z-index: 4;
+      top: 17%;
+      left: 7.8%;
+      width: 18%;
+      min-width: 125px;
+      height: 36%;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 63% 24%, rgba(224, 236, 255, 0.7) 0 5%, transparent 5.5%),
+        linear-gradient(180deg, #1f3349, #142535 63%, #111d29 100%);
+      border: 8px solid #202b35;
+      box-shadow: inset 0 0 0 1px rgba(220, 232, 245, 0.14), 0 18px 42px rgba(0, 0, 0, 0.19);
+    }
+
+    .window::before,
+    .window::after {
+      position: absolute;
+      z-index: 2;
+      content: "";
+      background: rgba(26, 38, 50, 0.86);
+    }
+
+    .window::before {
+      top: 0;
+      bottom: 0;
+      left: 49%;
+      width: 7px;
+    }
+
+    .window::after {
+      top: 48%;
+      right: 0;
+      left: 0;
+      height: 7px;
+    }
+
+    .window-sill {
+      position: absolute;
+      z-index: 5;
+      top: calc(53% - 4px);
+      left: 6.5%;
+      width: 20.6%;
+      height: 2.1%;
+      min-height: 10px;
+      background: #26323e;
+      box-shadow: 0 7px 8px rgba(0, 0, 0, 0.23);
+    }
+
+    .moonbeam {
+      position: absolute;
+      z-index: 2;
+      top: 52%;
+      left: 10%;
+      width: 36%;
+      height: 54%;
+      opacity: 0.14;
+      background: linear-gradient(137deg, rgba(139, 176, 222, 0.38), transparent 70%);
+      clip-path: polygon(0 0, 23% 0, 100% 100%, 33% 100%);
+      transition: opacity 600ms ease;
+    }
+
+    .room.is-lit .moonbeam {
+      opacity: 0.06;
+    }
+
+    .wall-art {
+      position: absolute;
+      z-index: 4;
+      top: 24%;
+      left: 34%;
+      width: 12%;
+      height: 21%;
+      border: 6px solid #25303b;
+      box-shadow: 0 0 0 1px rgba(191, 208, 214, 0.05), inset 0 0 0 1px #101721;
+      transform: rotate(-1.8deg);
+      transition: border-color 540ms ease, box-shadow 540ms ease;
+    }
+
+    .wall-art::before {
+      position: absolute;
+      inset: 16%;
+      content: "";
+      opacity: 0.25;
+      background:
+        linear-gradient(133deg, transparent 46%, #879bad 47% 49%, transparent 50%),
+        linear-gradient(43deg, transparent 48%, #726d83 49% 51%, transparent 52%);
+    }
+
+    .room.light-ceiling .wall-art {
+      border-color: #65757c;
+      box-shadow: 0 0 17px rgba(216, 236, 240, 0.11), inset 0 0 0 1px #23333c;
+    }
+
+    .rug {
+      position: absolute;
+      z-index: 3;
+      right: 18%;
+      bottom: 4.5%;
+      width: 40%;
+      height: 18%;
+      background:
+        repeating-linear-gradient(90deg, rgba(238, 177, 105, 0.08) 0 3px, transparent 3px 14px),
+        #1b252d;
+      border: 1px solid rgba(202, 178, 137, 0.13);
+      border-radius: 50%;
+      transform: perspective(280px) rotateX(56deg) rotateZ(-6deg);
+      transition: background 570ms ease, border-color 570ms ease, filter 570ms ease;
+    }
+
+    .room.light-floor .rug {
+      background:
+        repeating-linear-gradient(90deg, rgba(255, 210, 150, 0.24) 0 3px, transparent 3px 14px),
+        #453129;
+      border-color: rgba(248, 183, 111, 0.32);
+    }
+
+    .desk {
+      position: absolute;
+      z-index: 8;
+      bottom: 21.5%;
+      left: 19%;
+      width: 32%;
+      height: 7.5%;
+      min-height: 37px;
+      background: linear-gradient(180deg, #313d40, #1a252a);
+      border-radius: 3px 3px 0 0;
+      box-shadow: 0 12px 18px rgba(0, 0, 0, 0.33);
+      transition: filter 540ms ease, background 540ms ease, box-shadow 540ms ease;
+    }
+
+    .desk::before,
+    .desk::after {
+      position: absolute;
+      top: 100%;
+      width: 9%;
+      height: 154%;
+      content: "";
+      background: linear-gradient(90deg, #182124, #2b3637 55%, #141c20);
+      transform-origin: top;
+    }
+
+    .desk::before {
+      left: 7%;
+      transform: skewX(-5deg);
+    }
+
+    .desk::after {
+      right: 7%;
+      transform: skewX(5deg);
+    }
+
+    .room.light-desk .desk {
+      background: linear-gradient(180deg, #766045, #2d2c27);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.31), 0 0 38px rgba(255, 188, 93, 0.1);
+      filter: brightness(1.3);
+    }
+
+    .book-stack {
+      position: absolute;
+      z-index: 10;
+      bottom: 28.5%;
+      left: 24%;
+      width: 7.8%;
+      height: 5%;
+      transform: rotate(-4deg);
+      transition: filter 500ms ease;
+    }
+
+    .book-stack::before,
+    .book-stack::after {
+      position: absolute;
+      right: 0;
+      left: 0;
+      height: 36%;
+      content: "";
+      border-radius: 1px;
+    }
+
+    .book-stack::before {
+      top: 0;
+      background: #384550;
+      box-shadow: 0 13px 0 #403845;
+    }
+
+    .book-stack::after {
+      top: 69%;
+      background: #7b6349;
+    }
+
+    .room.light-desk .book-stack {
+      filter: brightness(1.6) saturate(1.14);
+    }
+
+    .chair {
+      position: absolute;
+      z-index: 7;
+      bottom: 12%;
+      left: 34%;
+      width: 12%;
+      height: 24%;
+      border: 10px solid #1c282e;
+      border-bottom: 0;
+      border-radius: 17px 17px 0 0;
+      transform: perspective(300px) rotateY(-13deg);
+      transition: border-color 550ms ease, filter 550ms ease;
+    }
+
+    .chair::before {
+      position: absolute;
+      right: -9px;
+      bottom: -23%;
+      left: -9px;
+      height: 31%;
+      content: "";
+      background: #202d30;
+      border-radius: 4px;
+    }
+
+    .room.light-desk .chair {
+      border-color: #4b4740;
+      filter: brightness(1.2);
+    }
+
+    .plant {
+      position: absolute;
+      z-index: 8;
+      bottom: 18%;
+      left: 8%;
+      width: 11%;
+      height: 25%;
+      min-width: 75px;
+      min-height: 120px;
+      transition: filter 520ms ease;
+    }
+
+    .plant-pot {
+      position: absolute;
+      bottom: 0;
+      left: 28%;
+      width: 48%;
+      height: 31%;
+      background: linear-gradient(90deg, #513c37, #2d2427);
+      clip-path: polygon(8% 0, 92% 0, 81% 100%, 19% 100%);
+    }
+
+    .plant-leaf {
+      position: absolute;
+      bottom: 24%;
+      left: 48%;
+      width: 15%;
+      height: 50%;
+      background: #253d37;
+      border-radius: 100% 0 100% 0;
+      transform-origin: bottom center;
+    }
+
+    .plant-leaf:nth-child(2) { transform: rotate(-51deg) scale(1.2); }
+    .plant-leaf:nth-child(3) { transform: rotate(-20deg) scale(0.95); }
+    .plant-leaf:nth-child(4) { transform: rotate(24deg) scale(1.08); }
+    .plant-leaf:nth-child(5) { transform: rotate(56deg) scale(0.83); }
+    .plant-leaf:nth-child(6) { transform: rotate(3deg) scale(1.33); }
+
+    .room.light-ceiling .plant,
+    .room.light-desk .plant {
+      filter: brightness(1.38) saturate(1.12);
+    }
+
+    .sofa {
+      position: absolute;
+      z-index: 7;
+      right: 18%;
+      bottom: 18%;
+      width: 25%;
+      height: 18%;
+      background: linear-gradient(135deg, #27323c, #1b252c);
+      border-radius: 16px 16px 3px 3px;
+      box-shadow: 0 11px 20px rgba(0, 0, 0, 0.35);
+      transition: background 600ms ease, filter 600ms ease, box-shadow 600ms ease;
+    }
+
+    .sofa::before {
+      position: absolute;
+      top: 22%;
+      right: 7%;
+      left: 7%;
+      height: 37%;
+      content: "";
+      border-top: 2px solid rgba(174, 190, 194, 0.1);
+      border-bottom: 2px solid rgba(174, 190, 194, 0.09);
+    }
+
+    .sofa::after {
+      position: absolute;
+      right: 4%;
+      bottom: -12%;
+      left: 4%;
+      height: 15%;
+      content: "";
+      background: #151e23;
+      border-radius: 0 0 8px 8px;
+    }
+
+    .room.light-ceiling .sofa {
+      background: linear-gradient(135deg, #52616a, #29373d);
+      filter: brightness(1.25);
+    }
+
+    .room.light-floor .sofa {
+      background: linear-gradient(135deg, #674c42, #332928);
+      box-shadow: 0 11px 22px rgba(0, 0, 0, 0.29), -17px 0 30px rgba(241, 162, 106, 0.1);
+      filter: brightness(1.21);
+    }
+
+    /* [ADDED 02] Three separate light casts: warm desk, cool ceiling, orange floor; long shadow. */
+    .light-cast {
+      position: absolute;
+      z-index: 6;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      mix-blend-mode: screen;
+      transition: opacity 570ms ease;
+    }
+
+    .desk-cast {
+      background:
+        radial-gradient(ellipse 31% 31% at 31% 63%, rgba(255, 208, 121, 0.67) 0%, rgba(255, 166, 83, 0.28) 36%, transparent 77%),
+        radial-gradient(ellipse 26% 21% at 29% 75%, rgba(255, 196, 105, 0.18), transparent 79%);
+    }
+
+    .ceiling-cast {
+      background:
+        radial-gradient(ellipse 68% 79% at 50% 10%, rgba(224, 241, 241, 0.34) 0%, rgba(175, 211, 218, 0.17) 46%, transparent 78%),
+        linear-gradient(180deg, rgba(207, 232, 232, 0.09), transparent 68%);
+    }
+
+    .ceiling-preview {
+      opacity: var(--ceiling-preview-opacity);
+      background: radial-gradient(ellipse 42% 56% at 50% 10%, rgba(225, 243, 244, 0.2), transparent 78%);
+      transition: opacity 140ms linear;
+    }
+
+    .floor-cast {
+      background:
+        radial-gradient(ellipse 47% 55% at 79% 69%, rgba(251, 171, 97, 0.52) 0%, rgba(244, 129, 78, 0.21) 41%, transparent 75%),
+        linear-gradient(119deg, transparent 60%, rgba(245, 159, 90, 0.1) 74%, transparent 91%);
+    }
+
+    .room.light-desk .desk-cast,
+    .room.light-ceiling .ceiling-cast,
+    .room.light-floor .floor-cast {
+      opacity: 1;
+    }
+
+    .floor-shadow {
+      position: absolute;
+      z-index: 6;
+      right: 16%;
+      bottom: 10%;
+      width: 40%;
+      height: 20%;
+      opacity: 0.42;
+      background: rgba(2, 7, 12, 0.68);
+      clip-path: polygon(55% 0, 100% 16%, 76% 100%, 0 93%);
+      filter: blur(3px);
+      transform-origin: right center;
+      transition: opacity 600ms ease, transform 720ms cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .room.light-floor .floor-shadow {
+      opacity: 0.68;
+      transform: translateX(-9%) scaleX(1.22);
+    }
+
+    /* [ADDED 03] Soft cursor flashlight; .is-lit fades it away whenever a lamp is on. */
+    .exploration-light {
+      position: absolute;
+      z-index: 20;
+      inset: 0;
+      pointer-events: none;
+      opacity: 1;
+      background:
+        radial-gradient(circle 152px at var(--explore-x) var(--explore-y), rgba(255, 228, 170, 0.22) 0%, rgba(196, 220, 209, 0.1) 35%, rgba(22, 37, 46, 0.03) 58%, transparent 76%);
+      mix-blend-mode: screen;
+      transition: opacity 700ms ease;
+    }
+
+    .room.is-lit .exploration-light {
+      opacity: 0;
+    }
+
+    .darkness-wash {
+      position: absolute;
+      z-index: 19;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.19;
+      background: rgba(2, 6, 10, 0.72);
+      transition: opacity 720ms ease;
+    }
+
+    .room.is-lit .darkness-wash {
+      opacity: 0;
+    }
+
+    /* [ADDED 04] Direct object interaction: subtle hover and keyboard-focus affordances. */
+    .lamp {
+      position: absolute;
+      z-index: 14;
+      padding: 0;
+      color: inherit;
+      background: transparent;
+      border: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .lamp::after,
+    .pull-cord::after {
+      position: absolute;
+      inset: -12px;
+      content: "";
+      opacity: 0;
+      border: 1px solid rgba(255, 227, 168, 0.38);
+      border-radius: 50%;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .lamp:hover::after,
+    .lamp:focus-visible::after,
+    .pull-cord:hover::after,
+    .pull-cord:focus-visible::after {
+      opacity: 1;
+      transform: scale(1.04);
+    }
+
+    /* [ADDED 05] Click lamp: desk-lamp parts, warm bulb, and brief flicker. */
+    .desk-lamp {
+      bottom: 27%;
+      left: 32%;
+      width: 11%;
+      min-width: 78px;
+      height: 25%;
+      min-height: 139px;
+      transform-origin: bottom center;
+      transition: transform 180ms ease;
+    }
+
+    .desk-lamp:hover,
+    .desk-lamp:focus-visible {
+      transform: scale(1.025) rotate(-1deg);
+    }
+
+    .desk-lamp::after {
+      inset: -10px;
+      border-radius: 44% 56% 30% 70%;
+    }
+
+    .desk-lamp-base {
+      position: absolute;
+      bottom: 0;
+      left: 9%;
+      width: 77%;
+      height: 11%;
+      background: #2d3839;
+      border-radius: 50%;
+      box-shadow: 0 3px 3px rgba(0, 0, 0, 0.28);
+      transition: background 450ms ease, box-shadow 450ms ease;
+    }
+
+    .desk-lamp-arm {
+      position: absolute;
+      bottom: 8%;
+      left: 40%;
+      width: 10%;
+      height: 56%;
+      background: #354243;
+      border-radius: 999px;
+      transform: rotate(24deg);
+      transform-origin: bottom;
+      transition: background 430ms ease;
+    }
+
+    .desk-lamp-neck {
+      position: absolute;
+      bottom: 58%;
+      left: 35%;
+      width: 32%;
+      height: 8%;
+      background: #354243;
+      border-radius: 999px;
+      transform: rotate(-30deg);
+      transform-origin: left;
+      transition: background 430ms ease;
+    }
+
+    .desk-lamp-shade {
+      position: absolute;
+      bottom: 59%;
+      left: 10%;
+      width: 50%;
+      height: 33%;
+      background: linear-gradient(100deg, #343d3e, #222c2f);
+      border-radius: 54% 44% 38% 33%;
+      clip-path: polygon(20% 0, 81% 7%, 100% 100%, 0 100%);
+      transition: background 430ms ease, filter 430ms ease;
+    }
+
+    .desk-lamp-bulb {
+      position: absolute;
+      bottom: 58%;
+      left: 18%;
+      width: 34%;
+      height: 13%;
+      opacity: 0.16;
+      background: var(--warm);
+      border-radius: 0 0 50% 50%;
+      box-shadow: 0 8px 17px rgba(255, 195, 99, 0);
+      transition: opacity 350ms ease, box-shadow 350ms ease;
+    }
+
+    .room.light-desk .desk-lamp-base,
+    .room.light-desk .desk-lamp-arm,
+    .room.light-desk .desk-lamp-neck {
+      background: #6e5d46;
+    }
+
+    .room.light-desk .desk-lamp-shade {
+      background: linear-gradient(100deg, #856443, #46392f);
+      filter: brightness(1.1);
+    }
+
+    .room.light-desk .desk-lamp-bulb {
+      opacity: 1;
+      box-shadow: 0 8px 21px rgba(255, 196, 105, 0.88), 0 0 38px rgba(255, 180, 91, 0.6);
+    }
+
+    .desk-lamp.is-flickering .desk-lamp-bulb {
+      animation: desk-flicker 260ms steps(2, end);
+    }
+
+    /* [ADDED 06] Hold lamp: pendant parts and a progress ring driven by --ceiling-charge. */
+    .ceiling-lamp {
+      top: 7%;
+      left: 50%;
+      width: 15%;
+      min-width: 116px;
+      height: 20%;
+      min-height: 112px;
+      transform: translateX(-50%);
+      touch-action: manipulation;
+    }
+
+    .ceiling-lamp:hover,
+    .ceiling-lamp:focus-visible {
+      transform: translateX(-50%) scale(1.025);
+    }
+
+    .ceiling-lamp::after {
+      inset: -15px;
+      border-radius: 50%;
+    }
+
+    .ceiling-lamp-stem {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 3px;
+      height: 34%;
+      background: #43515d;
+      transform: translateX(-50%);
+      transition: background 330ms ease;
+    }
+
+    .ceiling-lamp-cap {
+      position: absolute;
+      top: 29%;
+      left: 50%;
+      width: 30%;
+      height: 14%;
+      background: #394752;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      transition: background 330ms ease;
+    }
+
+    .ceiling-lamp-shade {
+      position: absolute;
+      top: 39%;
+      left: 50%;
+      width: 81%;
+      height: 37%;
+      background: linear-gradient(180deg, #35434d, #202c35);
+      border-radius: 49% 51% 20% 20% / 78% 78% 27% 27%;
+      box-shadow: inset 0 -5px 4px rgba(0, 0, 0, 0.17);
+      transform: translateX(-50%);
+      transition: background 360ms ease, filter 360ms ease;
+    }
+
+    .ceiling-lamp-bulb {
+      position: absolute;
+      top: 66%;
+      left: 50%;
+      width: 39%;
+      height: 23%;
+      opacity: 0.13;
+      background: var(--cool);
+      border-radius: 0 0 50% 50%;
+      box-shadow: 0 9px 21px rgba(207, 239, 240, 0);
+      transform: translateX(-50%);
+      transition: opacity 110ms linear, box-shadow 110ms linear;
+    }
+
+    .charge-ring {
+      position: absolute;
+      top: 29%;
+      left: 50%;
+      width: 102%;
+      aspect-ratio: 1;
+      opacity: 0;
+      background: conic-gradient(from -90deg, rgba(214, 242, 242, 0.9) var(--ceiling-charge), rgba(214, 242, 242, 0.08) 0deg);
+      border-radius: 50%;
+      mask: radial-gradient(transparent 61%, #000 63%);
+      transform: translateX(-50%) scale(0.91);
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .ceiling-lamp.is-charging .charge-ring {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+
+    .room.light-ceiling .ceiling-lamp-stem,
+    .room.light-ceiling .ceiling-lamp-cap {
+      background: #718b92;
+    }
+
+    .room.light-ceiling .ceiling-lamp-shade {
+      background: linear-gradient(180deg, #88a1a7, #405c64);
+      filter: brightness(1.18);
+    }
+
+    .room.light-ceiling .ceiling-lamp-bulb {
+      opacity: 1;
+      box-shadow: 0 9px 23px rgba(213, 241, 242, 0.9), 0 0 44px rgba(188, 224, 230, 0.43);
+    }
+
+    /* [ADDED 07] Pull lamp: sunset-colored shade, bulb, and stand. */
+    .floor-lamp {
+      position: absolute;
+      z-index: 14;
+      right: 7%;
+      bottom: 16%;
+      width: 14%;
+      height: 39%;
+      min-width: 104px;
+      min-height: 222px;
+    }
+
+    .floor-lamp-stand {
+      position: absolute;
+      bottom: 2%;
+      left: 50%;
+      width: 5px;
+      height: 57%;
+      background: #343e40;
+      border-radius: 999px;
+      transform: translateX(-50%);
+      transition: background 480ms ease;
+    }
+
+    .floor-lamp-base {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 53%;
+      height: 5%;
+      min-height: 9px;
+      background: #30393b;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      transition: background 480ms ease;
+    }
+
+    .floor-lamp-shade {
+      position: absolute;
+      top: 6%;
+      left: 50%;
+      width: 87%;
+      height: 28%;
+      background: linear-gradient(90deg, #363b38, #222928);
+      clip-path: polygon(22% 0, 78% 0, 100% 100%, 0 100%);
+      transform: translateX(-50%);
+      transition: background 480ms ease, filter 480ms ease;
+    }
+
+    .floor-lamp-bulb {
+      position: absolute;
+      top: 28%;
+      left: 50%;
+      width: 57%;
+      height: 8%;
+      opacity: 0.1;
+      background: var(--sunset);
+      border-radius: 0 0 50% 50%;
+      box-shadow: 0 7px 24px rgba(242, 159, 90, 0);
+      transform: translateX(-50%);
+      transition: opacity 400ms ease, box-shadow 400ms ease;
+    }
+
+    .room.light-floor .floor-lamp-stand,
+    .room.light-floor .floor-lamp-base {
+      background: #6a5240;
+    }
+
+    .room.light-floor .floor-lamp-shade {
+      background: linear-gradient(90deg, #8e5c3e, #4b332d);
+      filter: brightness(1.12);
+    }
+
+    .room.light-floor .floor-lamp-bulb {
+      opacity: 1;
+      box-shadow: 0 7px 27px rgba(244, 165, 94, 0.95), 0 0 48px rgba(241, 137, 77, 0.52);
+    }
+
+    /* [ADDED 07] Pull distance stretches the cord; threshold glow and spring-back give feedback. */
+    .pull-cord {
+      --pull-offset: 0px;
+      position: absolute;
+      z-index: 3;
+      top: 29%;
+      left: 60%;
+      width: 52px;
+      height: 58%;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      touch-action: none;
+      transform: translateX(-50%);
+    }
+
+    .pull-cord::after {
+      inset: 6px 0 2px;
+      border-radius: 30px;
+    }
+
+    .cord-line {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 2px;
+      height: calc(64px + var(--pull-offset));
+      background: linear-gradient(90deg, #3b4141, #a18a70 47%, #3b4141);
+      box-shadow: 1px 0 rgba(0, 0, 0, 0.2);
+      transform: translateX(-50%);
+      transition: height 280ms cubic-bezier(.22, 1.4, .36, 1);
+    }
+
+    .cord-knot {
+      position: absolute;
+      top: calc(61px + var(--pull-offset));
+      left: 50%;
+      width: 18px;
+      height: 23px;
+      background: #76624d;
+      border: 1px solid #a99170;
+      border-radius: 45% 45% 56% 56%;
+      box-shadow: 0 3px 4px rgba(0, 0, 0, 0.32);
+      transform: translateX(-50%);
+      transition: top 280ms cubic-bezier(.22, 1.4, .36, 1), background 370ms ease, box-shadow 370ms ease;
+    }
+
+    .pull-cord.is-pulling .cord-line,
+    .pull-cord.is-pulling .cord-knot {
+      transition: none;
+    }
+
+    .pull-cord.is-ready .cord-knot {
+      background: var(--warm);
+      box-shadow: 0 0 14px rgba(255, 203, 120, 0.68);
+    }
+
+    .pull-cord.is-springing .cord-line,
+    .pull-cord.is-springing .cord-knot {
+      animation: cord-spring 440ms cubic-bezier(.22, 1.4, .36, 1);
+    }
+
+    .room.light-floor .cord-knot {
+      background: #b77c52;
+      border-color: #e5a56f;
+    }
+
+    /* [ADDED 08] Fading opening hint, first-discovery mode names, and "Too bright?" styling. */
+    .hint {
+      position: absolute;
+      z-index: 30;
+      top: 48%;
+      left: 50%;
+      margin: 0;
+      color: rgba(242, 236, 222, 0.92);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.75rem, 4vw, 3.7rem);
+      font-style: italic;
+      letter-spacing: -0.045em;
+      pointer-events: none;
+      text-shadow: 0 3px 17px rgba(0, 0, 0, 0.55);
+      transform: translate(-50%, -50%);
+      transition: opacity 800ms ease, transform 800ms ease;
+    }
+
+    .hint.fade-away {
+      opacity: 0;
+      transform: translate(-50%, -56%);
+    }
+
+    .mode-toast {
+      position: absolute;
+      z-index: 32;
+      right: 24px;
+      bottom: 22px;
+      max-width: calc(100% - 48px);
+      padding: 8px 11px;
+      color: #dcd7cb;
+      opacity: 0;
+      background: rgba(9, 14, 19, 0.57);
+      border: 1px solid rgba(226, 224, 210, 0.16);
+      border-radius: 999px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.11em;
+      pointer-events: none;
+      text-transform: uppercase;
+      transform: translateY(8px);
+      transition: opacity 340ms ease, transform 340ms ease, color 340ms ease, border-color 340ms ease;
+    }
+
+    .mode-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .mode-toast.question {
+      color: #ffe0ab;
+      border-color: rgba(255, 203, 120, 0.52);
+    }
+
+    /* [ADDED 09] Optional Midnight Mode: a temporary color wash and lamp flicker. */
+    .midnight-wash {
+      position: absolute;
+      z-index: 18;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      background:
+        radial-gradient(ellipse at 70% 18%, rgba(132, 127, 235, 0.33), transparent 45%),
+        linear-gradient(150deg, rgba(17, 34, 86, 0.23), rgba(72, 30, 106, 0.16));
+      mix-blend-mode: screen;
+      transition: opacity 620ms ease;
+    }
+
+    .room.midnight-mode .midnight-wash {
+      opacity: 1;
+    }
+
+    .room.midnight-mode .desk-lamp-bulb,
+    .room.midnight-mode .ceiling-lamp-bulb,
+    .room.midnight-mode .floor-lamp-bulb {
+      animation: room-flicker 360ms steps(2, end) 2;
+    }
+
+    .room.midnight-mode .floor-cast {
+      filter: hue-rotate(55deg);
+    }
+
+    .scene-caption {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 4px 0;
+      color: #89939b;
+      font-size: 0.72rem;
+      line-height: 1.5;
+    }
+
+    .scene-caption span:last-child {
+      color: #727d85;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.64rem;
+      letter-spacing: 0.08em;
+      text-align: right;
+      text-transform: uppercase;
+    }
+
+    /* [ADDED 10] Animation definitions for the click lamp, returning cord, and Easter egg. */
+    @keyframes desk-flicker {
+      0%, 18% { opacity: 0.15; }
+      26%, 52% { opacity: 1; }
+      63% { opacity: 0.36; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes cord-spring {
+      0% { transform: translateX(-50%) translateY(0); }
+      43% { transform: translateX(-50%) translateY(8px); }
+      72% { transform: translateX(-50%) translateY(-4px); }
+      100% { transform: translateX(-50%) translateY(0); }
+    }
+
+    @keyframes room-flicker {
+      0%, 100% { filter: brightness(1); }
+      42% { filter: brightness(1.3); }
+      60% { filter: brightness(0.86); }
+    }
+
+    /* [ADDED 11] Responsive room positions and control sizes for smaller screens. */
+    @media (max-width: 760px) {
+      .page {
+        width: min(100% - 24px, 1240px);
+        padding-top: 13px;
+      }
+
+      .wordmark {
+        display: block;
+        padding-left: 18px;
+        font-size: 0.73rem;
+      }
+
+      .wordmark::before {
+        position: absolute;
+        left: 0;
+        margin-top: 2px;
+      }
+
+      .wordmark small {
+        display: block;
+        margin-top: 4px;
+      }
+
+      .room {
+        min-height: max(590px, 74svh);
+        aspect-ratio: auto;
+      }
+
+      .window {
+        top: 15%;
+        left: 4.5%;
+        width: 27%;
+        height: 29%;
+      }
+
+      .window-sill {
+        top: 44%;
+        left: 2.5%;
+        width: 31%;
+      }
+
+      .wall-art {
+        top: 24%;
+        left: 37%;
+        width: 18%;
+        height: 16%;
+      }
+
+      .desk {
+        bottom: 23%;
+        left: 7%;
+        width: 45%;
+      }
+
+      .desk-lamp {
+        bottom: 29%;
+        left: 27%;
+        width: 16%;
+      }
+
+      .book-stack {
+        bottom: 29.5%;
+        left: 16%;
+        width: 12%;
+      }
+
+      .chair {
+        bottom: 13%;
+        left: 32%;
+        width: 18%;
+        height: 21%;
+      }
+
+      .plant {
+        bottom: 19%;
+        left: 2%;
+        transform: scale(0.82);
+        transform-origin: bottom left;
+      }
+
+      .ceiling-lamp {
+        width: 20%;
+      }
+
+      .floor-lamp {
+        right: 2%;
+        bottom: 18%;
+        width: 20%;
+      }
+
+      .sofa {
+        right: 16%;
+        bottom: 20%;
+        width: 30%;
+        height: 15%;
+      }
+
+      .rug {
+        right: 12%;
+        width: 48%;
+      }
+
+      .hint {
+        top: 49%;
+      }
+
+      .scene-caption {
+        flex-direction: column;
+        gap: 4px;
+        padding-left: 2px;
+      }
+
+      .scene-caption span:last-child {
+        text-align: left;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .room {
+        min-height: 560px;
+      }
+
+      .window {
+        min-width: 0;
+      }
+
+      .ceiling-lamp {
+        min-width: 98px;
+        min-height: 101px;
+      }
+
+      .desk-lamp {
+        min-width: 67px;
+        min-height: 125px;
+      }
+
+      .floor-lamp {
+        min-width: 90px;
+        min-height: 205px;
+      }
+
+      .mode-toast {
+        right: 13px;
+        bottom: 13px;
+        font-size: 0.56rem;
+      }
+
+      .hint {
+        font-size: 2.25rem;
+      }
+    }
+
+    /* [ADDED 11] Reduce decorative CSS transitions and animations when requested by the OS. */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">
+      <div class="wordmark">Find the Light <small>an interactive room study</small></div>
+      <button class="reset-room" id="resetRoom" type="button" aria-label="Reset all room lights" title="Reset room">↻</button>
+    </header>
+
+    <main>
+      <section class="room-shell" aria-labelledby="roomTitle">
+        <h1 class="sr-only" id="roomTitle">Find the Light interactive room</h1>
+        <p class="sr-only" id="roomInstructions">Explore a dim room to find three directly interactive lights. The desk lamp toggles with a click. The ceiling light needs a long press. The floor lamp turns on or off when its pull cord is dragged down. For keyboard access, use Enter or Space on the desk lamp and pull cord. Hold Enter or Space on the ceiling pendant until it reaches full charge.</p>
+
+        <!-- [ADDED 01-03] Room objects, separate light layers, and the floor-shadow element. -->
+        <div class="room" id="room" aria-describedby="roomInstructions">
+          <div class="ceiling-line" aria-hidden="true"></div>
+          <div class="window" aria-hidden="true"></div>
+          <div class="window-sill" aria-hidden="true"></div>
+          <div class="moonbeam" aria-hidden="true"></div>
+          <div class="wall-art" aria-hidden="true"></div>
+          <div class="rug" aria-hidden="true"></div>
+
+          <div class="desk-cast light-cast" aria-hidden="true"></div>
+          <div class="ceiling-cast light-cast" aria-hidden="true"></div>
+          <div class="ceiling-preview light-cast" aria-hidden="true"></div>
+          <div class="floor-cast light-cast" aria-hidden="true"></div>
+          <div class="floor-shadow" aria-hidden="true"></div>
+
+          <div class="desk" aria-hidden="true"></div>
+          <div class="book-stack" aria-hidden="true"></div>
+          <div class="chair" aria-hidden="true"></div>
+          <div class="plant" aria-hidden="true">
+            <span class="plant-pot"></span>
+            <span class="plant-leaf"></span><span class="plant-leaf"></span><span class="plant-leaf"></span><span class="plant-leaf"></span><span class="plant-leaf"></span>
+          </div>
+          <div class="sofa" aria-hidden="true"></div>
+
+          <!-- [ADDED 05] The desk lamp itself is the click/tap target. -->
+          <button class="lamp desk-lamp" id="deskLamp" type="button" aria-pressed="false" aria-label="Desk lamp, off. Activate to toggle the warm reading light.">
+            <span class="desk-lamp-base" aria-hidden="true"></span>
+            <span class="desk-lamp-arm" aria-hidden="true"></span>
+            <span class="desk-lamp-neck" aria-hidden="true"></span>
+            <span class="desk-lamp-shade" aria-hidden="true"></span>
+            <span class="desk-lamp-bulb" aria-hidden="true"></span>
+          </button>
+
+          <!-- [ADDED 06] The ceiling pendant is the hold target; its ring shows charging. -->
+          <button class="lamp ceiling-lamp" id="ceilingLamp" type="button" aria-pressed="false" aria-label="Ceiling pendant, off. Press and hold to charge the main light.">
+            <span class="ceiling-lamp-stem" aria-hidden="true"></span>
+            <span class="ceiling-lamp-cap" aria-hidden="true"></span>
+            <span class="ceiling-lamp-shade" aria-hidden="true"></span>
+            <span class="ceiling-lamp-bulb" aria-hidden="true"></span>
+            <span class="charge-ring" aria-hidden="true"></span>
+          </button>
+
+          <!-- [ADDED 07] The floor lamp contains a draggable, keyboard-accessible pull cord. -->
+          <div class="floor-lamp" id="floorLamp">
+            <span class="floor-lamp-stand"></span>
+            <span class="floor-lamp-base"></span>
+            <span class="floor-lamp-shade"></span>
+            <span class="floor-lamp-bulb"></span>
+            <button class="pull-cord" id="pullCord" type="button" aria-pressed="false" aria-label="Floor lamp pull cord, off. Drag the cord down and release. Press Enter or Space for a keyboard equivalent.">
+              <span class="cord-line" aria-hidden="true"></span>
+              <span class="cord-knot" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <!-- [ADDED 03,08,09] Exploration glow, temporary messages, and the hidden-mode overlay. -->
+          <div class="midnight-wash" aria-hidden="true"></div>
+          <div class="darkness-wash" aria-hidden="true"></div>
+          <div class="exploration-light" id="explorationLight" aria-hidden="true"></div>
+          <p class="hint" id="introHint" aria-hidden="true">Find the light.</p>
+          <div class="mode-toast" id="modeToast" aria-live="polite" aria-atomic="true"></div>
+        </div>
+      </section>
+
+      <p class="scene-caption">
+        <span>Light shifts space. Space shifts mood.</span>
+        <span>03 sources · no system audio</span>
+      </p>
+    </main>
+  </div>
+
+  <div class="sr-only" id="liveRegion" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      // [ADDED 06,07,09] Gesture settings: 1.18-second hold, 78px pull, 6-second secret sequence.
+      const HOLD_DURATION = 1180;
+      const PULL_THRESHOLD = 78;
+      const PULL_LIMIT = 116;
+      const EASTER_EGG_WINDOW = 6000;
+
+      const room = document.getElementById("room");
+      const deskLamp = document.getElementById("deskLamp");
+      const ceilingLamp = document.getElementById("ceilingLamp");
+      const pullCord = document.getElementById("pullCord");
+      const resetRoom = document.getElementById("resetRoom");
+      const modeToast = document.getElementById("modeToast");
+      const introHint = document.getElementById("introHint");
+      const liveRegion = document.getElementById("liveRegion");
+
+      // [ADDED 12] Central binary light state; all lamps start off. Interaction timers follow.
+      const lightState = {
+        desk: false,
+        ceiling: false,
+        floor: false
+      };
+
+      const state = {
+        holdActive: false,
+        holdCompleted: false,
+        holdStart: 0,
+        holdFrame: null,
+        pullActive: false,
+        pullPointerId: null,
+        pullStartY: 0,
+        pullDistance: 0,
+        pullKeyboardTimer: null,
+        seenModes: new Set(),
+        toastTimer: null,
+        tooBrightTimer: null,
+        allBrightSeen: false,
+        sequence: [],
+        midnightTimer: null,
+        pointer: {
+          currentX: 50,
+          currentY: 47,
+          targetX: 50,
+          targetY: 47
+        }
+      };
+
+      // [ADDED 12] Eight atmospheres indexed by desk / ceiling / floor on-off values.
+      const roomModes = {
+        "000": "Darkness",
+        "100": "Reading",
+        "010": "Focus",
+        "001": "Cozy",
+        "110": "Working",
+        "101": "Sunset",
+        "011": "Ambient",
+        "111": "Awake"
+      };
+
+      function stateKey() {
+        return [lightState.desk, lightState.ceiling, lightState.floor]
+          .map((isOn) => (isOn ? "1" : "0"))
+          .join("");
+      }
+
+      // [ADDED 08,11] Screen-reader announcements and short-lived visual mode messages.
+      function announce(message) {
+        liveRegion.textContent = "";
+        window.setTimeout(() => {
+          liveRegion.textContent = message;
+        }, 20);
+      }
+
+      function showToast(text, type = "") {
+        window.clearTimeout(state.toastTimer);
+        modeToast.textContent = text;
+        modeToast.classList.toggle("question", type === "question");
+        modeToast.classList.add("show");
+
+        state.toastTimer = window.setTimeout(() => {
+          modeToast.classList.remove("show", "question");
+        }, type === "question" ? 2100 : 1650);
+      }
+
+      // [ADDED 11] Keep accessible names and pressed states in sync with each lamp.
+      function updateAccessibleLabels() {
+        deskLamp.setAttribute(
+          "aria-label",
+          "Desk lamp, " + (lightState.desk ? "on" : "off") + ". Activate to toggle the warm reading light."
+        );
+        deskLamp.setAttribute("aria-pressed", String(lightState.desk));
+
+        ceilingLamp.setAttribute(
+          "aria-label",
+          "Ceiling pendant, " + (lightState.ceiling ? "on" : "off") + ". Press and hold to " + (lightState.ceiling ? "turn off" : "charge the main light") + "."
+        );
+        ceilingLamp.setAttribute("aria-pressed", String(lightState.ceiling));
+
+        pullCord.setAttribute(
+          "aria-label",
+          "Floor lamp pull cord, " + (lightState.floor ? "on" : "off") + ". Drag the cord down and release. Press Enter or Space for a keyboard equivalent."
+        );
+        pullCord.setAttribute("aria-pressed", String(lightState.floor));
+      }
+
+      // [ADDED 12] Apply every visual state centrally; show first-discovery names and "Too bright?".
+      function updateRoomLighting({ announceMode = true } = {}) {
+        const key = stateKey();
+        const lightCount = Object.values(lightState).filter(Boolean).length;
+
+        room.classList.toggle("light-desk", lightState.desk);
+        room.classList.toggle("light-ceiling", lightState.ceiling);
+        room.classList.toggle("light-floor", lightState.floor);
+        room.classList.toggle("is-lit", lightCount > 0);
+        room.classList.toggle("all-on", lightCount === 3);
+        room.dataset.mode = key;
+        updateAccessibleLabels();
+
+        // [REVISED] Delayed feedback must still describe the current room.
+        if (key !== "111") {
+          window.clearTimeout(state.tooBrightTimer);
+          state.tooBrightTimer = null;
+          if (modeToast.classList.contains("question")) {
+            window.clearTimeout(state.toastTimer);
+            modeToast.classList.remove("show", "question");
+          }
+        }
+
+        if (announceMode && key !== "000" && !state.seenModes.has(key)) {
+          state.seenModes.add(key);
+          const mode = roomModes[key];
+          showToast(mode);
+          announce(mode + " lighting mode discovered.");
+        }
+
+        if (key === "111" && !state.allBrightSeen && state.tooBrightTimer === null) {
+          state.tooBrightTimer = window.setTimeout(() => {
+            state.tooBrightTimer = null;
+            if (stateKey() !== "111") return;
+            // Count the question as seen only after it actually appears.
+            state.allBrightSeen = true;
+            showToast("Too bright?", "question");
+            announce("All three lights are on. Too bright?");
+          }, 1840);
+        }
+      }
+
+      // [ADDED 05] Flicker the desk bulb briefly when its state changes.
+      function pulseDeskLamp() {
+        deskLamp.classList.remove("is-flickering");
+        void deskLamp.offsetWidth;
+        deskLamp.classList.add("is-flickering");
+        window.setTimeout(() => deskLamp.classList.remove("is-flickering"), 290);
+      }
+
+      // [ADDED 12] Shared state-change entry point used by all three gestures.
+      function setLight(lightName, isOn, { origin = "interaction" } = {}) {
+        if (lightState[lightName] === isOn) {
+          return;
+        }
+
+        lightState[lightName] = isOn;
+
+        if (lightName === "desk") {
+          pulseDeskLamp();
+        }
+
+        updateRoomLighting();
+
+        const description = {
+          desk: "The reading light " + (isOn ? "settles into a warm pool." : "clicks back into the room's shadows."),
+          ceiling: "The main light " + (isOn ? "fills the room with a cool, clear wash." : "releases the room back into dimness."),
+          floor: "The floor lamp " + (isOn ? "casts a long sunset shadow." : "lets the orange corner soften away.")
+        };
+
+        if (origin !== "reset") {
+          announce(description[lightName]);
+        }
+
+        if (isOn && origin !== "reset") {
+          recordLightSequence(lightName);
+        }
+      }
+
+      // [ADDED 09] Switching on desk -> floor -> ceiling within six seconds reveals Midnight Mode.
+      function recordLightSequence(lightName) {
+        const now = performance.now();
+        state.sequence = state.sequence.filter((event) => now - event.time <= EASTER_EGG_WINDOW);
+        state.sequence.push({ lightName, time: now });
+
+        const recent = state.sequence.slice(-3).map((event) => event.lightName).join(",");
+        if (recent === "desk,floor,ceiling") {
+          triggerMidnightMode();
+          state.sequence = [];
+        }
+      }
+
+      function triggerMidnightMode() {
+        window.clearTimeout(state.midnightTimer);
+        room.classList.add("midnight-mode");
+        showToast("Midnight Mode");
+        announce("Midnight Mode found.");
+        state.midnightTimer = window.setTimeout(() => {
+          room.classList.remove("midnight-mode");
+        }, 4200);
+      }
+
+      // [ADDED 06] HOLD: accumulate the ring and light preview; a full charge toggles the lamp.
+      function updateCeilingCharge(progress) {
+        const clamped = Math.max(0, Math.min(1, progress));
+        room.style.setProperty("--ceiling-charge", (clamped * 360).toFixed(0) + "deg");
+        room.style.setProperty("--ceiling-preview-opacity", (clamped * 0.82).toFixed(2));
+      }
+
+      function beginCeilingHold(event) {
+        if (state.holdActive || state.holdCompleted) {
+          return;
+        }
+
+        state.holdActive = true;
+        state.holdCompleted = false;
+        state.holdStart = performance.now();
+        ceilingLamp.classList.add("is-charging");
+
+        if (event && typeof event.pointerId === "number") {
+          try {
+            ceilingLamp.setPointerCapture(event.pointerId);
+          } catch {
+            // Pointer capture is a progressive enhancement; the interaction still works without it.
+          }
+        }
+
+        const charge = (now) => {
+          if (!state.holdActive) {
+            return;
+          }
+
+          const progress = (now - state.holdStart) / HOLD_DURATION;
+          updateCeilingCharge(progress);
+
+          if (progress >= 1) {
+            state.holdActive = false;
+            state.holdCompleted = true;
+            ceilingLamp.classList.remove("is-charging");
+            updateCeilingCharge(0);
+            setLight("ceiling", !lightState.ceiling);
+            return;
+          }
+
+          state.holdFrame = window.requestAnimationFrame(charge);
+        };
+
+        state.holdFrame = window.requestAnimationFrame(charge);
+      }
+
+      // [ADDED 06] Releasing early cancels charging and fades the temporary preview.
+      function endCeilingHold(event) {
+        if (event && typeof event.pointerId === "number") {
+          try {
+            if (ceilingLamp.hasPointerCapture(event.pointerId)) {
+              ceilingLamp.releasePointerCapture(event.pointerId);
+            }
+          } catch {
+            // Nothing needs to happen when a browser has already released capture.
+          }
+        }
+
+        if (!state.holdActive) {
+          state.holdCompleted = false;
+          return;
+        }
+
+        state.holdActive = false;
+        window.cancelAnimationFrame(state.holdFrame);
+        ceilingLamp.classList.remove("is-charging");
+        updateCeilingCharge(0);
+        announce("A brief ceiling-light flicker fades away. The charge did not reach the threshold.");
+      }
+
+      // [ADDED 07] PULL: track downward travel and light the knot when the threshold is reached.
+      function setPullDistance(distance) {
+        state.pullDistance = Math.max(0, Math.min(PULL_LIMIT, distance));
+        pullCord.style.setProperty("--pull-offset", state.pullDistance.toFixed(0) + "px");
+        pullCord.classList.toggle("is-ready", state.pullDistance >= PULL_THRESHOLD);
+      }
+
+      function startPull(event) {
+        if (state.pullActive) {
+          return;
+        }
+
+        event.preventDefault();
+        state.pullActive = true;
+        state.pullPointerId = event.pointerId;
+        state.pullStartY = event.clientY;
+        pullCord.classList.add("is-pulling");
+
+        try {
+          pullCord.setPointerCapture(event.pointerId);
+        } catch {
+          // Pointer capture is optional.
+        }
+      }
+
+      function continuePull(event) {
+        if (!state.pullActive || event.pointerId !== state.pullPointerId) {
+          return;
+        }
+
+        event.preventDefault();
+        setPullDistance(event.clientY - state.pullStartY);
+      }
+
+      // [ADDED 07] On release, toggle only after a sufficient pull; return the cord in all cases.
+      function finishPull(event, { cancelled = false } = {}) {
+        if (!state.pullActive || (event && event.pointerId !== state.pullPointerId)) {
+          return;
+        }
+
+        const reachedThreshold = state.pullDistance >= PULL_THRESHOLD && !cancelled;
+        const pointerId = state.pullPointerId;
+        state.pullActive = false;
+        state.pullPointerId = null;
+        pullCord.classList.remove("is-pulling", "is-ready");
+
+        if (typeof pointerId === "number") {
+          try {
+            if (pullCord.hasPointerCapture(pointerId)) {
+              pullCord.releasePointerCapture(pointerId);
+            }
+          } catch {
+            // The browser may have released it before this handler.
+          }
+        }
+
+        setPullDistance(0);
+        pullCord.classList.remove("is-springing");
+        void pullCord.offsetWidth;
+        pullCord.classList.add("is-springing");
+        window.setTimeout(() => pullCord.classList.remove("is-springing"), 470);
+
+        if (reachedThreshold) {
+          setLight("floor", !lightState.floor);
+        } else if (!cancelled) {
+          announce("The pull cord springs back before the light catches.");
+        }
+      }
+
+      // [ADDED 11] Enter/Space provides an animated keyboard equivalent of the pull gesture.
+      function keyboardPull() {
+        if (state.pullKeyboardTimer) {
+          return;
+        }
+
+        pullCord.classList.add("is-pulling");
+        setPullDistance(PULL_THRESHOLD + 11);
+
+        state.pullKeyboardTimer = window.setTimeout(() => {
+          state.pullKeyboardTimer = null;
+          pullCord.classList.remove("is-pulling", "is-ready");
+          setPullDistance(0);
+          pullCord.classList.add("is-springing");
+          setLight("floor", !lightState.floor);
+          window.setTimeout(() => pullCord.classList.remove("is-springing"), 470);
+        }, 220);
+      }
+
+      // [ADDED 03] Track pointer position and ease the exploration light toward it each frame.
+      function updateExplorerTarget(event) {
+        const bounds = room.getBoundingClientRect();
+        state.pointer.targetX = ((event.clientX - bounds.left) / bounds.width) * 100;
+        state.pointer.targetY = ((event.clientY - bounds.top) / bounds.height) * 100;
+      }
+
+      function animateExplorer() {
+        state.pointer.currentX += (state.pointer.targetX - state.pointer.currentX) * 0.16;
+        state.pointer.currentY += (state.pointer.targetY - state.pointer.currentY) * 0.16;
+        room.style.setProperty("--explore-x", state.pointer.currentX.toFixed(2) + "%");
+        room.style.setProperty("--explore-y", state.pointer.currentY.toFixed(2) + "%");
+        window.requestAnimationFrame(animateExplorer);
+      }
+
+      // [ADDED 13] Reset lamp states, gestures, discoveries, and special-effect timers.
+      function resetExperience() {
+        window.cancelAnimationFrame(state.holdFrame);
+        window.clearTimeout(state.pullKeyboardTimer);
+        window.clearTimeout(state.midnightTimer);
+        window.clearTimeout(state.toastTimer);
+        window.clearTimeout(state.tooBrightTimer);
+
+        lightState.desk = false;
+        lightState.ceiling = false;
+        lightState.floor = false;
+        state.holdActive = false;
+        state.holdCompleted = false;
+        state.pullActive = false;
+        state.pullPointerId = null;
+        state.pullDistance = 0;
+        state.pullKeyboardTimer = null;
+        state.tooBrightTimer = null;
+        state.seenModes = new Set();
+        state.allBrightSeen = false;
+        state.sequence = [];
+        room.classList.remove("midnight-mode");
+        ceilingLamp.classList.remove("is-charging");
+        pullCord.classList.remove("is-pulling", "is-ready", "is-springing");
+        updateCeilingCharge(0);
+        setPullDistance(0);
+        modeToast.classList.remove("show", "question");
+        updateRoomLighting({ announceMode: false });
+        announce("Room reset. All three lights are off.");
+      }
+
+      // [ADDED 05-07,11] Bind click, pointer hold/pull, and keyboard equivalents to the room objects.
+      deskLamp.addEventListener("click", () => {
+        setLight("desk", !lightState.desk);
+      });
+
+      ceilingLamp.addEventListener("pointerdown", beginCeilingHold);
+      ceilingLamp.addEventListener("pointerup", endCeilingHold);
+      ceilingLamp.addEventListener("pointercancel", endCeilingHold);
+      ceilingLamp.addEventListener("lostpointercapture", () => endCeilingHold());
+      // [REVISED] Leaving a keyboard hold cancels it, even if keyup happens elsewhere.
+      ceilingLamp.addEventListener("blur", () => endCeilingHold());
+      window.addEventListener("blur", () => endCeilingHold());
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) endCeilingHold();
+      });
+      ceilingLamp.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          if (!event.repeat) beginCeilingHold();
+        }
+      });
+      ceilingLamp.addEventListener("keyup", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          endCeilingHold();
+        }
+      });
+
+      pullCord.addEventListener("pointerdown", startPull);
+      pullCord.addEventListener("pointermove", continuePull);
+      pullCord.addEventListener("pointerup", finishPull);
+      pullCord.addEventListener("pointercancel", (event) => finishPull(event, { cancelled: true }));
+      // [REVISED] Capture loss is an interruption, not an intentional release.
+      pullCord.addEventListener("lostpointercapture", (event) => finishPull(event, { cancelled: true }));
+      pullCord.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          if (!event.repeat) keyboardPull();
+        }
+      });
+
+      room.addEventListener("pointermove", updateExplorerTarget);
+      room.addEventListener("pointerdown", updateExplorerTarget);
+      resetRoom.addEventListener("click", resetExperience);
+
+      // [ADDED 03,08] Fade the intro after three seconds, initialize darkness, start pointer easing.
+      window.setTimeout(() => introHint.classList.add("fade-away"), 3000);
+      updateRoomLighting({ announceMode: false });
+      animateExplorer();
+    })();
+  </script>
+</body>
+</html>
