@@ -1,0 +1,80 @@
+Retest date: 2026-09-26
+Command: node tests/interactions.test.cjs
+Runner: Codex
+Scope: Actual inline JavaScript with simulated DOM, input events, and timers.
+This is not a browser, rendering, touchscreen, or personal play-test.
+
+TAP version 13
+# Subtest: initial darkness and desk click keep classes, mode and aria state synchronized
+ok 1 - initial darkness and desk click keep classes, mode and aria state synchronized
+  ---
+  duration_ms: 2.512
+  ...
+# Subtest: ceiling cancels a short hold and toggles exactly once per completed hold
+ok 2 - ceiling cancels a short hold and toggles exactly once per completed hold
+  ---
+  duration_ms: 2.654917
+  ...
+# Subtest: ceiling keyboard hold cancels on element blur and can be retried
+ok 3 - ceiling keyboard hold cancels on element blur and can be retried
+  ---
+  duration_ms: 1.127833
+  ...
+# Subtest: ceiling keyboard hold cancels on window blur and can be retried
+ok 4 - ceiling keyboard hold cancels on window blur and can be retried
+  ---
+  duration_ms: 1.038625
+  ...
+# Subtest: ceiling keyboard hold cancels on document hidden and can be retried
+ok 5 - ceiling keyboard hold cancels on document hidden and can be retried
+  ---
+  duration_ms: 3.56625
+  ...
+# Subtest: ceiling prevents default scrolling on repeated Space keydown
+ok 6 - ceiling prevents default scrolling on repeated Space keydown
+  ---
+  duration_ms: 0.799792
+  ...
+# Subtest: floor ignores a short pull, toggles on a full pull, and cancels pointercancel
+ok 7 - floor ignores a short pull, toggles on a full pull, and cancels pointercancel
+  ---
+  duration_ms: 0.637083
+  ...
+# Subtest: unexpected pull capture loss cancels instead of toggling
+ok 8 - unexpected pull capture loss cancels instead of toggling
+  ---
+  duration_ms: 0.479167
+  ...
+# Subtest: all eight combinations are reachable using the three gestures
+ok 9 - all eight combinations are reachable using the three gestures
+  ---
+  duration_ms: 1.432709
+  ...
+# Subtest: reset cancels active ceiling hold, pointer pull and pending keyboard pull
+ok 10 - reset cancels active ceiling hold, pointer pull and pending keyboard pull
+  ---
+  duration_ms: 2.737625
+  ...
+# Subtest: reset cancels pending Too bright toast and permits later rediscovery
+ok 11 - reset cancels pending Too bright toast and permits later rediscovery
+  ---
+  duration_ms: 1.474916
+  ...
+# Subtest: Too bright appears once when all-on persists
+ok 12 - Too bright appears once when all-on persists
+  ---
+  duration_ms: 1.226042
+  ...
+# Subtest: leaving all-on cancels stale Too bright and allows it on a later sustained entry
+ok 13 - leaving all-on cancels stale Too bright and allows it on a later sustained entry
+  ---
+  duration_ms: 0.980667
+  ...
+1..13
+# tests 13
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 22.87925
