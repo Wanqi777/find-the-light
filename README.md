@@ -194,11 +194,9 @@ One question is still unresolved: **will a first-time user understand the hold a
 
 ## Evidence and files
 
-Five process screenshots were extracted unchanged from my supplied **find the light.docx**. Two additional room screenshots were copied unchanged from the desktop captures I supplied. Together, they document the plan, code explanation, and visible room states; they are not generated mockups or a video demonstration. See [screenshot provenance](screenshots/README.md) for the image list.
+Process screenshots were extracted unchanged from my supplied **find the light.docx**. Together, they document the plan, code explanation, and visible room states. See [screenshot provenance](screenshots/README.md) for the image list.
 
 - [index.html](index.html) — the complete browser experience.
 - [tests/interactions.test.cjs](tests/interactions.test.cjs) — repeatable simulated interaction tests.
 - [evidence/test-results.txt](evidence/test-results.txt) — saved output from the September 26 retest.
 - [screenshots/](screenshots/) — five process screenshots and two room screenshots.
-
-For Canvas, submit [this personal repository](https://github.com/Wanqi777/find-the-light). If repository visibility changes to private, grant the teaching team access before submitting.
