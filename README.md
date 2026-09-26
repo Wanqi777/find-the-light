@@ -1,49 +1,48 @@
-# Find the Light
+# Find the Light 💡
 
-A small interactive web experience about discovering different ways to turn on lights in a dark room.
+**Find the Light** is a small interactive web experience that explores creative ways of interacting with light and space.
 
-**MSTU 5013 · Describe It. Prompt It. Reflect On It.**
+The project began with a simple room containing three lights. Instead of keeping three identical switches, I gradually redesigned the experience so that users could discover different ways to interact with each light.
 
-**Repository:** [Wanqi777/find-the-light](https://github.com/Wanqi777/find-the-light)
-
-## Open the project
-
-Download this repository, unzip it, and open [index.html](index.html) in a modern browser. The page contains all its HTML, CSS, and JavaScript; no installation, external assets, or API keys are needed.
-
-To use an optional local server, run the following inside the project folder and visit `http://localhost:8000/`:
-
-```sh
-python3 -m http.server 8000
-```
-
-| Lamp | How to interact | Feedback |
-| --- | --- | --- |
-| Desk lamp | Click or tap; click again to turn it off. | A brief flicker and a warm reading light. |
-| Ceiling lamp | Hold for about 1.2 seconds; release early to cancel. | A growing charge ring and a cool light preview. A completed hold toggles once. |
-| Floor lamp | Pull the cord downward at least 78 pixels, then release. | The knot glows at the threshold and the cord springs back. |
-
-Use Tab to reach the controls. Enter or Space activates the desk lamp and provides a keyboard equivalent for the floor cord; hold Enter or Space for the ceiling lamp. The reset control turns all lights off and clears discoveries.
+---
 
 ## Step 1 — Describe
 
-I wanted to make a playful room for classmates and anyone curious about interactive design, where users discover three lamps through click, hold, and pull gestures. The experience should encourage experimentation with light and atmosphere while remaining small enough to test one main interaction: holding the ceiling lamp to charge it.
+The original scene contained three lights in a dark room.
 
-> When someone explores the dark room, the experience should encourage them to discover how each light works through interaction and visual feedback.
+At the beginning:
 
-My starting idea was that all three lights would be off and turning on any one would illuminate the room. I then wanted to move beyond three identical switches: a soft cursor glow would support exploration, and each lamp would have its own gesture and lighting character. For the main interaction, a short hold should only preview the light; a completed 1.18-second hold should change its on/off state.
+- all three lights are off;
+- the room is dark;
+- turning on any light illuminates the room.
+
+The goal was not simply to create three switches, but to make the room more **playful, interactive, and exploratory**.
 
 <details>
 <summary>Screenshot 1 — My design plan</summary>
 
 ![Original planning notes describing the cozy room and the proposed Find the Light experience](screenshots/plans.png)
 
-This saved planning screenshot includes an earlier switch-based direction and the later exploration concept. It records ideas, including proposed sound; it is not a screenshot of every feature implemented in the current build.
+> **When someone explores the dark room, the experience should encourage them to discover how each light works through interaction and visual feedback.**
+
+My final interaction plan was:
+
+- **Desk lamp:** click
+- **Ceiling lamp:** press and hold
+- **Floor lamp:** pull the cord
 
 </details>
 
 ## Step 2 — Work with AI
 
-I used **Codex** to help turn the idea into HTML, CSS, and JavaScript. My notes moved from “turn on a light” toward giving each lamp a different interaction. I also asked for explanations of the generated code so I could connect visible behavior to its implementation.
+I used **Codex** throughout the project to generate ideas, write HTML/CSS/JavaScript, compare alternatives, and revise the interaction design.
+
+My first redesign focused on:
+
+- a warmer cartoon-style room;
+- dynamic brightness depending on how many lights were on;
+- animated light switches;
+- simple sound feedback.
 
 These selected prompts preserve important decisions from the brief and conversation. Chinese excerpts are followed by English translations.
 
@@ -54,20 +53,6 @@ These selected prompts preserve important decisions from the brief and conversat
 | “直接根据这个prompt生成项目” — “Generate the project directly from this prompt.” | Turn the detailed design brief into a browser-based implementation. |
 | “can you show me the changed code in the original html, just highlight the related code” | Locate relevant changes in the source rather than only describe the result. |
 | “show me the difference just in code level (html, css, js)” | Separate the structure, visual styling, and interaction logic. |
-
-### Using a code map to understand the result
-
-I explored explanations in code blocks, a line-numbered guide, and comments inside the original HTML file. I chose a **code map** supported by inline annotations: a table connects each feature to what the code does and where to find it. This made it easier to trace an idea such as “hold to charge” to its timing, feedback, and event handlers.
-
-![AI-generated code map connecting room features with their purpose and source locations](screenshots/code-map.png)
-
-*Screenshot 2 — A saved code map from the AI-assisted explanation process. Its line numbers refer to that earlier version and may differ from the current file.*
-
-![Source screenshot highlighting comments for gesture settings and the central lamp state](screenshots/annotated-source.png)
-
-*Screenshot 3 — Inline comments identifying the 1.18-second hold, 78-pixel pull, and central lamp state. These are explanatory annotations, not a Git before-and-after diff.*
-
-In the current [index.html](index.html), search for `ADDED 06` to follow the ceiling lamp across CSS, HTML, and JavaScript; `ADDED 07` follows the pull cord; `ADDED 12` identifies the shared lamp state and room updates. `REVISED` marks the later interruption and delayed-feedback fixes.
 
 ## Step 3 — Test and Revise
 
@@ -99,6 +84,20 @@ The two screenshots below show the dark room and a floor-lamp-on state. In the f
 ![The floor lamp casting an orange glow over the chair and rug while the other lamps remain off](screenshots/room-floor-on.png)
 
 *Room screenshot B — Floor lamp on, saved September 26 at 01:31:36. These are two lighting states, not before-and-after code versions. A still image does not demonstrate the pull distance, hold timing, or cancellation behavior.*
+
+### Using a code map to understand the result
+
+I explored explanations in code blocks, a line-numbered guide, and comments inside the original HTML file. I chose a **code map** supported by inline annotations: a table connects each feature to what the code does and where to find it. This made it easier to trace an idea such as “hold to charge” to its timing, feedback, and event handlers.
+
+![AI-generated code map connecting room features with their purpose and source locations](screenshots/code-map.png)
+
+*Screenshot 2 — A saved code map from the AI-assisted explanation process. Its line numbers refer to that earlier version and may differ from the current file.*
+
+![Source screenshot highlighting comments for gesture settings and the central lamp state](screenshots/annotated-source.png)
+
+*Screenshot 3 — Inline comments identifying the 1.18-second hold, 78-pixel pull, and central lamp state. These are explanatory annotations, not a Git before-and-after diff.*
+
+In the current [index.html](index.html), search for `ADDED 06` to follow the ceiling lamp across CSS, HTML, and JavaScript; `ADDED 07` follows the pull cord; `ADDED 12` identifies the shared lamp state and room updates. `REVISED` marks the later interruption and delayed-feedback fixes.
 
 ### Debugging and retesting the current code
 
