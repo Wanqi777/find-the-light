@@ -118,9 +118,9 @@ Based on testing, I continued developing the project by:
 - adjusting the interface to make the room more immersive;
 - keeping only AI-generated additions that supported the experience.
 - 
-### Testing / Debugging the current code
+### Debugging the current code
 
-# Using a code map to understand the result
+#### Understanding in the code level
 
 Instead of only showing raw code differences, I used a **code map** that connects each visible design change to the corresponding part of the source code.
 
@@ -132,11 +132,11 @@ This made it easier to understand not only **what changed**, but also **where th
 
 ![Source screenshot highlighting comments for gesture settings and the central lamp state](screenshots/annotated-source.png)
 
-*Screenshot 3 — Inline comments identifying the 1.18-second hold, 78-pixel pull, and central lamp state. These are explanatory annotations, not a Git before-and-after diff.*
+*Screenshot 3 — Inline comments identifying the code. These are explanatory annotations, not a Git before-and-after diff.*
 
-In the current [index.html](index.html), search for `ADDED 06` to follow the ceiling lamp across CSS, HTML, and JavaScript; `ADDED 07` follows the pull cord; `ADDED 12` identifies the shared lamp state and room updates. `REVISED` marks the later interruption and delayed-feedback fixes.
+#### Testing
 
-Codex ran the actual inline JavaScript with a simulated document, input events, and clock. On September 25, the initial checks had **7 passes and 6 failures**. After the following revisions, the same **13 tests passed**. The current repository was checked again on September 26: **13 passed, 0 failed**. These are automated logic checks, not my own browser play-test.
+Codex ran the actual inline JavaScript with a simulated document, input events, and clock. On September 25, the initial checks had **7 passes and 6 failures**. After the following revisions, the same **13 tests passed**. The current repository was checked again on September 26: **13 passed, 0 failed**. /automated logic checks
 
 | Situation tested | Expected behavior | Observed before the fix | Revision and retest |
 | --- | --- | --- | --- |
