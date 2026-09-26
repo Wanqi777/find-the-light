@@ -12,22 +12,6 @@ The ceiling lamp is the main interaction evaluated for this activity. The simple
 
 This description summarizes the supplied design brief. The testing record and reflection below were added later; they are not presented as notes written before implementation.
 
-## Project placement
-
-The workspace did not contain the prompt's described pre-existing three-light room. To avoid overwriting the unrelated Dark Pattern Clinic, To-do List, and Volume Ward projects, this standalone implementation lives in `Labs/find-the-light/`.
-
-## Run
-
-Download or clone the repository, open this project's folder, and open `index.html` in a modern browser. No install, account, network request, audio, or external asset is required. All HTML, CSS, and JavaScript are inside that file.
-
-For an optional local server, run this from the folder containing `index.html`:
-
-```sh
-python3 -m http.server 8000
-```
-
-Then visit `http://localhost:8000/`.
-
 ## Interactions
 
 - **Desk lamp — Click / discovery:** click or tap the lamp to toggle a compact warm reading pool. It gives a brief flicker before settling.
