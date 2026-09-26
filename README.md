@@ -194,7 +194,7 @@ One question is still unresolved: **will a first-time user understand the hold a
 
 ## Evidence and files
 
-Process screenshots were extracted unchanged from my supplied **find the light.docx**. Together, they document the plan, code explanation, and visible room states. See [screenshot provenance](screenshots/README.md) for the image list.
+Process screenshots document the plan, code explanation, and visible room states. See [screenshot provenance](screenshots/README.md) for the image list.
 
 - [index.html](index.html) — the complete browser experience.
 - [tests/interactions.test.cjs](tests/interactions.test.cjs) — repeatable simulated interaction tests.
