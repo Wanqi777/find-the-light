@@ -101,11 +101,11 @@ The two screenshots below show the dark room and a floor-lamp-on state. In the f
 
 ![The room with all three lamps off and furniture still faintly visible](screenshots/room-dark.png)
 
-*Room screenshot A — Dark room, saved September 26 at 01:29:43.*
+*Room screenshot A — Dark room.*
 
 ![The floor lamp casting an orange glow over the chair and rug while the other lamps remain off](screenshots/room-floor-on.png)
 
-*Room screenshot B — Floor lamp on, saved September 26 at 01:31:36. These are two lighting states, not before-and-after code versions. A still image does not demonstrate the pull distance, hold timing, or cancellation behavior.*
+*Room screenshot B — Floor lamp on.*
 
 ### What I Changed
 
