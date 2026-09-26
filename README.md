@@ -1,114 +1,164 @@
 # Find the Light
 
-A quiet, dependency-free room interaction study for **Activity: Describe It. Prompt It. Reflect On It.**
+A small interactive web experience about discovering different ways to turn on lights in a dark room.
 
-## Original idea and intended experience
+**MSTU 5013 · Describe It. Prompt It. Reflect On It.**
 
-Find the Light is a small browser experience for classmates and people who enjoy playful, low-pressure exploration. Users discover lamps inside a dim illustrated room and change its atmosphere through clicking, holding, and pulling rather than a separate control panel.
+**Repository:** [Wanqi777/find-the-light](https://github.com/Wanqi777/find-the-light)
 
-**When someone holds the ceiling pendant for about 1.2 seconds, the experience should show a growing charge ring and light preview, then toggle the light exactly once; releasing early or leaving the interaction should cancel the charge.**
+## Open the project
 
-The ceiling lamp is the main interaction evaluated for this activity. The simpler desk lamp and physical pull cord provide contrasting ways to explore the same idea: how an object's appearance and feedback can suggest an action. The intent is curiosity, not speed or a score.
+Download this repository, unzip it, and open [index.html](index.html) in a modern browser. The page contains all its HTML, CSS, and JavaScript; no installation, external assets, or API keys are needed.
 
-This description summarizes the supplied design brief. The testing record and reflection below were added later; they are not presented as notes written before implementation.
+To use an optional local server, run the following inside the project folder and visit `http://localhost:8000/`:
 
-## Interactions
+```sh
+python3 -m http.server 8000
+```
 
-- **Desk lamp — Click / discovery:** click or tap the lamp to toggle a compact warm reading pool. It gives a brief flicker before settling.
-- **Ceiling pendant — Hold / charge:** press and hold the pendant for about 1.2 seconds. The ring and cool wash accumulate as it charges; release too early and the preview fades. A full hold toggles it on or off.
-- **Floor lamp — Drag / pull:** drag its physical pull cord down and release after the knot warms. The cord springs back and toggles the soft orange ambient light.
-
-Keyboard equivalents are intentionally available without adding visible control panels: desk lamp uses Enter/Space; ceiling lamp is held with Enter/Space; floor-lamp cord uses Enter/Space. Pointer events cover mouse, touch, and pen input.
-
-## Lighting combinations
-
-| State | Desk | Ceiling | Floor | Environment |
-| --- | --- | --- | --- | --- |
-| 000 | off | off | off | Darkness |
-| 100 | on | off | off | Reading |
-| 010 | off | on | off | Focus |
-| 001 | off | off | on | Cozy |
-| 110 | on | on | off | Working |
-| 101 | on | off | on | Sunset |
-| 011 | off | on | on | Ambient |
-| 111 | on | on | on | Awake |
-
-The mode name appears only the first time a non-dark combination is discovered. After all three lights remain on for about 1.8 seconds, the room quietly asks “Too bright?” once per session (or until reset), inviting experimentation rather than treating maximum brightness as the goal.
-
-## AI collaboration and selected prompts
-
-**Tool used:** Codex. The following are excerpts from the actual design brief and conversation, not a complete conversation history.
-
-1. **Define the experience:** “用户应该直接与房间中的物体互动。” (“Users should interact directly with objects in the room.”) This set the design direction: discoverable room objects instead of a conventional switch panel.
-2. **Specify behavior:** “松开过早则灯光逐渐熄灭。” (“If released too early, the light gradually fades.”) This made the hold threshold and cancellation behavior important, not just the finished appearance.
-3. **Request implementation:** “直接根据这个prompt生成项目” (“Generate the project directly from this prompt.”) Codex generated a self-contained HTML/CSS/JavaScript version. The expected existing three-lamp project was not found, so it used a separate folder to preserve the unrelated projects.
-4. **Ask to understand the output:** “can you show me the changed code in the original html, just highlight the related code” and “show me the difference just in code level (html, css, js)”. The source retains numbered `ADDED` comments linking the interface, styling, and behavior to the implementation.
-
-The human-directed choices were the exploratory room, distinct click/hold/pull gestures, and different lighting moods. Codex supplied the code, chose CSS-based lighting layers for this implementation, and later added simulated regression checks. Whether the subtle hints actually make the gestures understandable still requires human play-testing; generated code and passing checks do not establish that on their own.
-
-## Implementation notes
-
-- `index.html` contains semantic structure, CSS room illustration, visual lighting layers, and all interaction logic in one file.
-- `lightState` is centrally managed and `updateRoomLighting()` maps its binary combination to light casts, furniture atmosphere, the mode whisper, cursor exploration state, and accessibility labels.
-- The initial radial-gradient exploration light follows the pointer only while every room light is off.
-- A low-cost optional Easter egg recognizes the quick sequence desk → floor → ceiling and briefly reveals **Midnight Mode**.
-- The prompt listed sound as a secondary enhancement; it was intentionally omitted so browser autoplay policies and audio are not needed for the core visual lesson.
-
-## Testing and revision record
-
-**2026-09-25 — automated checks run by Codex, not a student browser test.** The test file loads the actual inline JavaScript in Node's isolated execution context with a simulated document, events, and clock. It checks observable mode attributes, light classes, accessibility states, and messages. It does not test rendering or prove that real browser events behave identically.
-
-Before the fixes: **13 tests, 7 passed, 6 failed.** After revising the interaction logic and running the same tests again: **13 passed, 0 failed.**
-
-| Test situation | Observed before revision | Change and retest result |
+| Lamp | How to interact | Feedback |
 | --- | --- | --- |
-| Hold the ceiling lamp for 400 ms, then move element focus, blur the window, or hide the document (3 tests) | Charging continued and switched the lamp on despite the interruption. | Cancel charging on all three interruption events; all three cases now remain off and allow a new hold. |
-| Send a repeated Space keydown while charging (1 test) | The repeated event was not prevented, leaving the browser's default behavior available. | Prevent the default for every activation-key event but only start on the first keydown; the event assertion now passes. |
-| Pull beyond the threshold, then unexpectedly lose pointer capture (1 test) | The floor lamp switched on as if the user had released intentionally. | Treat capture loss as cancellation; it now returns the cord without changing the light. |
-| Turn all lamps on, then turn one off before the delayed question (1 test) | “Too bright?” still appeared while a lamp was off. | Cancel the timer when leaving all-on, recheck state before displaying, and mark the question seen only when shown; cancellation and later rediscovery now pass. |
+| Desk lamp | Click or tap; click again to turn it off. | A brief flicker and a warm reading light. |
+| Ceiling lamp | Hold for about 1.2 seconds; release early to cancel. | A growing charge ring and a cool light preview. A completed hold toggles once. |
+| Floor lamp | Pull the cord downward at least 78 pixels, then release. | The knot glows at the threshold and the cord springs back. |
 
-The other seven passing tests cover initial darkness and desk toggles; short and completed holds; short, full, and cancelled pulls; all eight light combinations; reset during gestures; reset during a pending question; and showing the all-on question only once. The code also dismisses a visible question when the room is no longer all-on, and applies repeated-key prevention to the floor cord; those two additional details were inspected but are not separate assertions in this suite.
+Use Tab to reach the controls. Enter or Space activates the desk lamp and provides a keyboard equivalent for the floor cord; hold Enter or Space for the ceiling lamp. The reset control turns all lights off and clears discoveries.
 
-To rerun the optional checks, use Node.js 18 or later from this project's folder:
+## Step 1 — Describe
+
+I wanted to make a playful room for classmates and anyone curious about interactive design, where users discover three lamps through click, hold, and pull gestures. The experience should encourage experimentation with light and atmosphere while remaining small enough to test one main interaction: holding the ceiling lamp to charge it.
+
+> When someone explores the dark room, the experience should encourage them to discover how each light works through interaction and visual feedback.
+
+My starting idea was that all three lights would be off and turning on any one would illuminate the room. I then wanted to move beyond three identical switches: a soft cursor glow would support exploration, and each lamp would have its own gesture and lighting character. For the main interaction, a short hold should only preview the light; a completed 1.18-second hold should change its on/off state.
+
+<details>
+<summary>Screenshot 1 — My design plan</summary>
+
+![Original planning notes describing the cozy room and the proposed Find the Light experience](screenshots/plans.png)
+
+This saved planning screenshot includes an earlier switch-based direction and the later exploration concept. It records ideas, including proposed sound; it is not a screenshot of every feature implemented in the current build.
+
+</details>
+
+## Step 2 — Work with AI
+
+I used **Codex** to help turn the idea into HTML, CSS, and JavaScript. My notes moved from “turn on a light” toward giving each lamp a different interaction. I also asked for explanations of the generated code so I could connect visible behavior to its implementation.
+
+These selected prompts preserve important decisions from the brief and conversation. Chinese excerpts are followed by English translations.
+
+| Prompt or exchange | What it helped me direct or understand |
+| --- | --- |
+| “用户应该直接与房间中的物体互动。” — “Users should interact directly with objects in the room.” | Replace the separate control panel with interactive lamps inside the scene. |
+| “松开过早则灯光逐渐熄灭。” — “If released too early, the light gradually fades.” | Define the difference between temporary feedback and a completed action. |
+| “直接根据这个prompt生成项目” — “Generate the project directly from this prompt.” | Turn the detailed design brief into a browser-based implementation. |
+| “can you show me the changed code in the original html, just highlight the related code” | Locate relevant changes in the source rather than only describe the result. |
+| “show me the difference just in code level (html, css, js)” | Separate the structure, visual styling, and interaction logic. |
+
+### Using a code map to understand the result
+
+I explored explanations in code blocks, a line-numbered guide, and comments inside the original HTML file. I chose a **code map** supported by inline annotations: a table connects each feature to what the code does and where to find it. This made it easier to trace an idea such as “hold to charge” to its timing, feedback, and event handlers.
+
+![AI-generated code map connecting room features with their purpose and source locations](screenshots/code-map.png)
+
+*Screenshot 2 — A saved code map from the AI-assisted explanation process. Its line numbers refer to that earlier version and may differ from the current file.*
+
+![Source screenshot highlighting comments for gesture settings and the central lamp state](screenshots/annotated-source.png)
+
+*Screenshot 3 — Inline comments identifying the 1.18-second hold, 78-pixel pull, and central lamp state. These are explanatory annotations, not a Git before-and-after diff.*
+
+In the current [index.html](index.html), search for `ADDED 06` to follow the ceiling lamp across CSS, HTML, and JavaScript; `ADDED 07` follows the pull cord; `ADDED 12` identifies the shared lamp state and room updates. `REVISED` marks the later interruption and delayed-feedback fixes.
+
+## Step 3 — Test and Revise
+
+### What I expected
+
+The room should start dark but remain explorable. Clicking, holding, or pulling should produce feedback that matches the action. A cancelled gesture should not switch on a lamp, and a message should describe the room's current state. Different lamp combinations should change the atmosphere, not simply make everything uniformly brighter.
+
+### What the development notes revealed
+
+My earlier redesign notes listed dynamic lighting, a cozy room, and animated switches. They also recorded unexpected interface text, the size of the interface, and a “Sound on” button. The accompanying classroom notes mention background sizing problems in some groups. These are earlier design/classroom observations, not verified failures of this repository's current build. The current project has no audio or sound button.
+
+<details>
+<summary>Screenshot 4 — Earlier redesign and unexpected details</summary>
+
+![Earlier notes listing dynamic lighting, a cozy room, animated switches, and unexpected interface details](screenshots/early-redesign.png)
+
+This screenshot preserves the earlier comparison rather than presenting those features as the current implementation.
+
+</details>
+
+### What actually happened in the room
+
+The two screenshots below show the dark room and a floor-lamp-on state. In the first, the furniture and lamp outlines remain visible even though the lamps are off. In the second, the floor lamp creates a warm orange glow around the chair and rug while the desk and ceiling lamps remain dim. This matches the intended contrast between darkness and localized lighting.
+
+![The room with all three lamps off and furniture still faintly visible](screenshots/room-dark.png)
+
+*Room screenshot A — Dark room, saved September 26 at 01:29:43.*
+
+![The floor lamp casting an orange glow over the chair and rug while the other lamps remain off](screenshots/room-floor-on.png)
+
+*Room screenshot B — Floor lamp on, saved September 26 at 01:31:36. These are two lighting states, not before-and-after code versions. A still image does not demonstrate the pull distance, hold timing, or cancellation behavior.*
+
+### Debugging and retesting the current code
+
+Codex ran the actual inline JavaScript with a simulated document, input events, and clock. On September 25, the initial checks had **7 passes and 6 failures**. After the following revisions, the same **13 tests passed**. The current repository was checked again on September 26: **13 passed, 0 failed**. These are automated logic checks, not my own browser play-test.
+
+| Situation tested | Expected behavior | Observed before the fix | Revision and retest |
+| --- | --- | --- | --- |
+| Start a keyboard hold, then move focus, blur the window, or hide the document. | Cancel the unfinished charge. | The ceiling lamp still turned on. | Added cancellation for the three interruptions. All three tests pass and a new hold can start. |
+| Receive repeated Space keydown events. | Keep charging without allowing the default key action. | Repeated events were not prevented. | Prevent defaults on every activation-key event; start only on the initial press. Test passes. |
+| Lose pointer capture after pulling beyond the threshold. | Cancel an interrupted pull. | The floor lamp toggled as though release were intentional. | Treat lost capture as cancellation. Test passes. |
+| Turn all lights on, then turn one off before “Too bright?” appears. | Do not show an outdated question. | The delayed question still appeared. | Cancel the pending timer, recheck the state, and count the question as seen only when displayed. Cancellation and later rediscovery pass. |
+
+The other checks cover desk toggles, short and completed holds, pull thresholds, all eight lighting combinations, and resetting pending interactions or messages. The `lightState` object stores three on/off values, while `updateRoomLighting()` derives the room's appearance from them. Keeping a temporary charge preview separate from that committed state is an important implementation choice.
+
+Run the checks with Node.js 18 or later from the project folder:
 
 ```sh
 node tests/interactions.test.cjs
 ```
 
-Node is only needed for these development checks, not to open or play the experience. Codex's attempted automated browser access was blocked by the browser security policy, so no browser play-test result is claimed here.
+See the [test source](tests/interactions.test.cjs) and [saved retest output](evidence/test-results.txt). Node is needed only for these checks, not to open the experience.
 
-## Browser play-test checklist — student verification still needed
+### Further hands-on checks
 
-These are expected outcomes, **not completed test results**. Check them only after trying the page yourself, and record what actually happened.
+The room screenshots document the visible dark and floor-lit states. The automated tests document logic separately. Neither establishes every gesture's usability, so the following checks remain to be recorded rather than being marked complete:
 
-- [ ] With all lights off, move the pointer. The dim exploration light follows; lighting any lamp hides it, and turning every lamp off restores it.
-- [ ] Click the desk lamp twice. It turns on and then off, with a brief flicker.
-- [ ] Release the ceiling pendant after a short hold. The preview fades and its on/off state does not change. Hold for at least 1.2 seconds: it toggles only once, even if you keep holding.
-- [ ] Focus the ceiling lamp with Tab, hold Space, and move focus away before completion. Charging stops. Repeat while switching to another tab or window.
-- [ ] Pull the floor cord a short distance and release: no toggle. Pull at least 78 pixels and release: one toggle and a spring-back. Check touch behavior separately on a real touch device.
-- [ ] Explore the eight combinations. Leave the all-on state quickly: no stale “Too bright?” question should appear. Leave all three on for about 1.8 seconds: the question appears.
-- [ ] Reset during a charge, a pull, or a pending message. All lamps remain off afterward.
-- [ ] Try a narrow viewport, keyboard-only navigation, and operating-system reduced motion. Check readability, focus visibility, and whether any remaining motion feels uncomfortable.
+- [ ] Open the room and compare a short ceiling press with a full hold. Note whether the ring communicates progress clearly.
+- [ ] Try a short pull and a full pull; check that only the full pull toggles the floor lamp.
+- [ ] Interrupt a keyboard hold by moving focus, and try again afterward.
+- [ ] Turn all lamps on, quickly turn one off, and check for outdated feedback. Try reset during a gesture.
+- [ ] Try a small screen and keyboard-only use. Record the device, expected result, actual result, and any remaining problem; a short recording could show the gesture timing that the existing screenshots cannot.
 
-**Your observation to add before submission:** device/browser; action tried; expected result; actual result; any change or unresolved issue. A screenshot or short recording is optional.
+### Remaining problems and next experiments
 
-## Remaining limitations
+My plan also proposed interactive furniture, plants, and windows. Those objects remain decorative. Hold and pull already have visual hints, including a charge ring and a glowing cord threshold, but I have not established whether a first-time user understands them. A useful next experiment is to watch someone explore without explaining the gestures, then adjust the hints based on where they hesitate.
 
-- The automated checks do not render the page or exercise native browser focus, touch capture, screen readers, or CSS animation. Browser appearance and the feel of the gestures need personal verification.
-- The charge ring and cord glow are deliberately subtle. Whether a new user understands them without instructions has not been established through user testing.
-- CSS reduced-motion styling is present, but the JavaScript pointer-follow easing still runs. This is a remaining accessibility/performance improvement, not a claim of full reduced-motion support.
-- Lighting and shadows are CSS illustrations, not physically simulated illumination. Furniture, plants, and the window are decorative rather than directly interactive. Sound is not implemented.
+Sound remains unimplemented. CSS reduced-motion styling exists, but the JavaScript cursor easing still runs. The automated checks do not establish screen-reader usability or real touch behavior. These limitations remain open rather than being treated as successful test results.
 
-## Reflection — draft to review in your own voice
+<details>
+<summary>Screenshot 5 — Ideas for further exploration</summary>
 
-My intention was to make turning on a light feel like discovering something in a room, rather than operating a dashboard. The implementation represents that idea through three gestures and distinct lighting colors. I chose the ceiling lamp as the main interaction to evaluate because its feedback has to communicate both progress and the difference between a short press and a completed hold. One important implementation choice is to store each lamp's on/off state centrally and derive the room's appearance from those states. This separates a temporary charging preview from a committed change. The implemented behavior reflects my intention, but I still need to test whether the subtle hints make sense to a person who has not read the instructions.
+![Future-development plan proposing direct room exploration, different lamp gestures, lighting moods, interactive objects, and subtle hints](screenshots/future-development.png)
 
-AI helped translate the brief into HTML, CSS, and JavaScript, and it helped inspect behavior beyond the intended happy path. The review identified that a keyboard hold could continue after focus moved away and that a delayed “Too bright?” message could describe a lighting state the user had already left. Those cases show why asking for a finished effect is not enough: I also need to decide what interruption should mean and when feedback is still relevant. The automated checks described in this repository are AI-run logic checks, not my own browser play-test. Before submitting, I need to add my actual observations and revise this reflection accordingly. The main unresolved design question is whether discovery remains inviting rather than confusing, especially for keyboard and touch users.
+Direct lamp interaction, lighting combinations, and visual hints are present in the current code. Sound and interaction with other room objects are still proposals.
 
-## Individual submission checklist
+</details>
 
-- [ ] Complete the browser checks and replace the observation note with your own specific results.
-- [ ] Review the reflection so it accurately represents your decisions and understanding.
-- [ ] Save `index.html`, this `README.md`, and the optional `tests/` folder in **your own GitHub repository**. The current local checkout's remote is the course repository; these changes have not been pushed by Codex.
-- [ ] Open your repository on GitHub and confirm the latest files and README are visible. Give the teaching team access if it is private.
-- [ ] Submit your personal repository URL in Canvas. A deployed website, a separate Google Doc, and a full AI conversation transcript are not required.
+## Step 4 — Reflection
+
+My intention was to make turning on lights feel playful and exploratory. My screenshots show a dark but visible room and the floor lamp's warm glow around the chair and rug, which matches my goal of changing the atmosphere through localized light. The current code also gives the lamps distinct gestures. Some ideas in my plan are still incomplete: the furniture and window do not respond to interaction, and sound is absent. The debugging process showed a mismatch between the intended behavior and the first implementation: a keyboard hold could continue after focus moved away, and “Too bright?” could appear after a light was already off. Revising interruption handling and checking the current lighting state made the behavior more consistent with the user's action. The automated tests now pass, but they do not tell me whether a new user will understand the hold and pull gestures; that remains a question for hands-on testing.
+
+AI helped me generate the implementation and examine the relationship between HTML, CSS, and JavaScript. Asking it to explain changes through a code map and inline comments was especially useful: I could connect a visible effect to a named section of code rather than only accept the finished page. I still needed to choose the experience I wanted and judge whether extra details supported exploration. The interruption fixes also gave me a concrete behavior to review rather than assuming the generated code was correct. My main lesson is to document intentions and write prompts with observable behavior, then compare the result with those intentions. A detailed prompt gives AI direction, but it does not replace testing or my responsibility to question the output. My next step is to check the subtle hints with another person and record what they actually do before deciding whether to add more interactive objects.
+
+## Evidence and files
+
+Five process screenshots were extracted unchanged from my supplied **find the light.docx**. Two additional room screenshots were copied unchanged from the desktop captures I supplied. Together, they document the plan, code explanation, and visible room states; they are not generated mockups or a video demonstration. See [screenshot provenance](screenshots/README.md) for the image list.
+
+- [index.html](index.html) — the complete browser experience.
+- [tests/interactions.test.cjs](tests/interactions.test.cjs) — repeatable simulated interaction tests.
+- [evidence/test-results.txt](evidence/test-results.txt) — saved output from the September 26 retest.
+- [screenshots/](screenshots/) — five process screenshots and two room screenshots.
+
+For Canvas, submit [this personal repository](https://github.com/Wanqi777/find-the-light). If repository visibility changes to private, grant the teaching team access before submitting.
