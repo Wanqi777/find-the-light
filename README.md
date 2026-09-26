@@ -58,8 +58,15 @@ These selected prompts preserve important decisions from the brief and conversat
 
 ### What I expected
 
-The room should start dark but remain explorable. Clicking, holding, or pulling should produce feedback that matches the action. A cancelled gesture should not switch on a lamp, and a message should describe the room's current state. Different lamp combinations should change the atmosphere, not simply make everything uniformly brighter.
+The room should start dark but remain explorable. Clicking, holding, or pulling should produce feedback that matches the action. Different lamp combinations should change the atmosphere, not simply make everything uniformly brighter.
 
+I expected the redesigned room to:
+
+- fill the browser window;
+- feel warmer and more visually interesting;
+- provide clear interaction feedback;
+- encourage users to explore rather than simply press three buttons.
+- 
 ### What the development notes revealed
 
 My earlier redesign notes listed dynamic lighting, a cozy room, and animated switches. They also recorded unexpected interface text, the size of the interface, and a “Sound on” button. The accompanying classroom notes mention background sizing problems in some groups. These are earlier design/classroom observations, not verified failures of this repository's current build. The current project has no audio or sound button.
@@ -73,7 +80,23 @@ This screenshot preserves the earlier comparison rather than presenting those fe
 
 </details>
 
-### What actually happened in the room
+### What actually happened
+
+Testing revealed several unexpected results.
+
+**1. The background did not fully fill the screen**
+
+The generated interface was smaller than expected and left unused space around the room.
+
+**2. AI added features I did not explicitly request**
+
+AI automatically introduced additional text instructions and a **Sound On** control.
+
+Some of these additions were useful, but they also changed the simplicity of the original design.
+
+**3. The new interactions needed stronger hints**
+
+Clicking was easy to understand, but **hold** and **pull** were less obvious without visual feedback.
 
 The two screenshots below show the dark room and a floor-lamp-on state. In the first, the furniture and lamp outlines remain visible even though the lamps are off. In the second, the floor lamp creates a warm orange glow around the chair and rug while the desk and ceiling lamps remain dim. This matches the intended contrast between darkness and localized lighting.
 
@@ -85,9 +108,22 @@ The two screenshots below show the dark room and a floor-lamp-on state. In the f
 
 *Room screenshot B — Floor lamp on, saved September 26 at 01:31:36. These are two lighting states, not before-and-after code versions. A still image does not demonstrate the pull distance, hold timing, or cancellation behavior.*
 
+### What I Changed
+
+Based on testing, I continued developing the project by:
+
+- moving away from three identical switches;
+- making the room itself the main interactive space;
+- introducing **click, hold, and pull** interactions;
+- adding visual feedback to support discovery;
+- adjusting the interface to make the room more immersive;
+- keeping only AI-generated additions that supported the experience.
+- 
 ### Using a code map to understand the result
 
-I explored explanations in code blocks, a line-numbered guide, and comments inside the original HTML file. I chose a **code map** supported by inline annotations: a table connects each feature to what the code does and where to find it. This made it easier to trace an idea such as “hold to charge” to its timing, feedback, and event handlers.
+Instead of only showing raw code differences, I used a **code map** that connects each visible design change to the corresponding part of the source code.
+
+This made it easier to understand not only **what changed**, but also **where the change was implemented**.
 
 ![AI-generated code map connecting room features with their purpose and source locations](screenshots/code-map.png)
 
@@ -147,9 +183,15 @@ Direct lamp interaction, lighting combinations, and visual hints are present in 
 
 ## Step 4 — Reflection
 
-My intention was to make turning on lights feel playful and exploratory. My screenshots show a dark but visible room and the floor lamp's warm glow around the chair and rug, which matches my goal of changing the atmosphere through localized light. The current code also gives the lamps distinct gestures. Some ideas in my plan are still incomplete: the furniture and window do not respond to interaction, and sound is absent. The debugging process showed a mismatch between the intended behavior and the first implementation: a keyboard hold could continue after focus moved away, and “Too bright?” could appear after a light was already off. Revising interruption handling and checking the current lighting state made the behavior more consistent with the user's action. The automated tests now pass, but they do not tell me whether a new user will understand the hold and pull gestures; that remains a question for hands-on testing.
+My intention was to make turning on lights feel playful and exploratory. My screenshots show a dark but visible room and the floor lamp's warm glow around the chair and rug, which matches my goal of changing the atmosphere through localized light. The current code also gives the lamps distinct gestures. Some ideas in my plan are still incomplete: the furniture and window do not respond to interaction, and sound is absent. 
 
-AI helped me generate the implementation and examine the relationship between HTML, CSS, and JavaScript. Asking it to explain changes through a code map and inline comments was especially useful: I could connect a visible effect to a named section of code rather than only accept the finished page. I still needed to choose the experience I wanted and judge whether extra details supported exploration. The interruption fixes also gave me a concrete behavior to review rather than assuming the generated code was correct. My main lesson is to document intentions and write prompts with observable behavior, then compare the result with those intentions. A detailed prompt gives AI direction, but it does not replace testing or my responsibility to question the output. My next step is to check the subtle hints with another person and record what they actually do before deciding whether to add more interactive objects.
+The final project matches my original intention better than the first version. The basic idea stayed the same—a dark room with three lights—but the interaction changed significantly. My first redesign still relied on conventional switches. After testing and iteration, I changed the experience to **click, hold, and pull**, which made exploring the room more playful and closer to the idea of “finding” the light.
+
+AI was especially useful for quickly generating prototypes, suggesting alternatives, writing interaction code, and comparing different versions. At the same time, I learned that AI often makes additional design decisions on its own. For example, it introduced text instructions and a sound button that I had not explicitly requested. I therefore still needed to decide which features supported my intention and which should be changed or removed.
+
+Another important lesson was that **prompts need to be specific**. Clear goals and action plans produced results closer to what I wanted. Keeping screenshots, prompts, and development plans was also useful because it allowed me to compare different iterations instead of only looking at the final result.
+
+One question is still unresolved: **will a first-time user understand the hold and pull interactions without being told how they work?** A next step would be to let someone unfamiliar with the project try it and observe what they attempt before giving them instructions.
 
 ## Evidence and files
 
