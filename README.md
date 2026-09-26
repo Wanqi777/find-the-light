@@ -68,7 +68,7 @@ I expected the redesigned room to:
 - 
 ### What the development notes revealed
 
-My earlier redesign notes listed dynamic lighting, a cozy room, and animated switches. They also recorded unexpected interface text, the size of the interface, and a “Sound on” button. The accompanying classroom notes mention background sizing problems in some groups. These are earlier design/classroom observations, not verified failures of this repository's current build. The current project has no audio or sound button.
+My earlier redesign notes listed dynamic lighting, a cozy room, and animated switches. They also recorded unexpected interface text, the size of the interface, and a “Sound on” button.
 
 <details>
 <summary>Screenshot 4 — Earlier redesign and unexpected details</summary>
