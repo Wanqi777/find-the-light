@@ -41,8 +41,7 @@ My first redesign focused on:
 
 - a warmer cartoon-style room;
 - dynamic brightness depending on how many lights were on;
-- animated light switches;
-- simple sound feedback.
+- animated light switches.
 
 These selected prompts preserve important decisions from the brief and conversation. Chinese excerpts are followed by English translations.
 
